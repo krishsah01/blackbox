@@ -19,6 +19,29 @@ questions retrieval cannot:
 The dataset is the project itself. Blackbox remembers its own nine-day
 build, starting from the first commit in this repository.
 
+## Running it
+
+Needs Node 26 or newer (SQLite and TypeScript stripping are built in, so
+there is no build step and no native dependency) and, for phrasing,
+`llama-server` from llama.cpp (`brew install llama.cpp`).
+
+```bash
+npm install
+npm run check                       # typecheck + tests
+node bin/blackbox.ts intake git .   # this repository becomes memories
+node bin/blackbox.ts status
+node bin/blackbox.ts ask "what happened today"
+```
+
+The brain lives in `./data` (gitignored). To phrase answers locally, start
+the pinned model (see `MODELS.md`) and add `--phrase`:
+
+```bash
+llama-server -hf bartowski/Llama-3.2-3B-Instruct-GGUF:Q4_K_M --host 127.0.0.1 --port 8089 --ctx-size 8192 --no-webui
+node bin/blackbox.ts model status
+node bin/blackbox.ts ask "what happened today" --phrase
+```
+
 ## Models
 
 Hybrid, local by default. A small Meta open weight (Llama, about 3B) runs
@@ -56,3 +79,4 @@ work is copied in; only ideas carry over.
 | --- | --- |
 | 2026-10-27 | Repository created. README with this section, `.gitignore` for recordings, model files and secrets. |
 | 2026-10-27 | `DECISIONS.md` seeded with the day's decisions (D1 to D9). `PLAN.md`: the agreed nine-day plan. Found that Muse Glimmer (30B) cannot run on the 16 GB build machine; local phrasing moves to a small Llama, Glimmer to partner inference behind the gate (D9). |
+| 2026-10-27 | Day 1 engine: TypeScript skeleton with tests, redaction (key shapes, assignments, emails, tokens, erased-values denylist), append-only SQLite event log with rebuildable memories and links, git intake (commits, branches, recorded links: touches, parent, cites D<n>, at), `ask "what happened today"` with citations and a computed label, CLI. Local model client with drained pipes; Llama 3.2 3B Instruct pinned as the local phrasing model (D10). The brain answered its first question about its own day from its own commits. |

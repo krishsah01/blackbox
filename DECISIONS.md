@@ -163,6 +163,23 @@ Day 1 measures the local Llama, not Glimmer; Glimmer joins on day 5 with
 the gate. If a model other than Llama is chosen for the local path, that is
 a new decision.
 
+### D10. Local phrasing model: Llama 3.2 3B Instruct, Q4_K_M (2026-10-27)
+
+**Decision.** The local phrasing model named in D9 is Llama 3.2 3B Instruct,
+the `Q4_K_M` GGUF from `bartowski/Llama-3.2-3B-Instruct-GGUF`, pinned by
+SHA-256 in `MODELS.md`, served by `llama-server` on 127.0.0.1:8089.
+
+**Why.** It is a Meta open weight, so the default path meets the Stage 1
+gate without any call leaving the machine. At about 2 GB on disk it leaves
+room for the engine, a browser and a screen recorder in 16 GB. An instruct
+model at 3B is enough to restate a cited answer in plain sentences, which
+is all the phrasing layer is allowed to do; it never adds facts.
+
+**Consequences.** The weights are pinned, not "latest". The system prompt
+marks memory text as data, not instructions. The engine's answer stays the
+evidence; the phrasing is labeled as phrased locally with the model name.
+Swapping to another local model is a new decision.
+
 ## Open
 
 Questions to settle when they come up, each becoming a numbered decision

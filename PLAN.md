@@ -179,3 +179,17 @@ every answer is computed and its inputs are visible. Nothing is mocked.
 
 Asked as they come up, not all at once. See the "Open" section of
 `DECISIONS.md`.
+
+## Notes (appended, dated)
+
+- **2026-10-27, day 1 done.** Everything on the day-1 list landed: skeleton
+  with tests, redaction, append-only store, git intake, "what happened
+  today" with citations and a computed label, a local model running. Two
+  changes against the plan as written: the local model is Llama 3.2 3B
+  Instruct, not Glimmer (D9, D10), and the evening question found a bug
+  (a moved branch shown at its old commit), fixed the same evening. One
+  observation for day 4: when phrasing, the 3B model repeated a step and
+  wrote a shortened citation that is not a real ref. The verify step that
+  strikes any sentence without a cited memory is needed, not optional.
+  Screen recording has not started yet; that is the owner's step and is
+  the first thing on day 2.
