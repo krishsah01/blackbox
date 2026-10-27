@@ -120,6 +120,49 @@ The Glimmer size is bounded by 16 GB RAM shared with the engine and a screen
 recorder, so the smallest Glimmer is the default. Video is sampled before
 SAM (about 2 fps), never raw footage.
 
+### D8. Name, visibility, plan and stack (2026-10-27)
+
+**Decision.** The project is named **Blackbox**. The GitHub repository
+`krishsah01/blackbox` is public from today. The nine-day plan in `PLAN.md`
+is agreed as written on 2026-10-27: six build days (why-chains and as-of
+first, egress gate on day 5, recordings and SAM on day 6), feature freeze
+Nov 2, video Nov 3, submission Nov 4 by noon ET. Stack: TypeScript on Node,
+SQLite, a local daemon with a web timeline, a CLI.
+
+**Why.** "Blackbox" is the flight-recorder metaphor the owner started with;
+the name collides with an existing coding-assistant product in search, and
+the owner accepted that. Public from day one makes the dates provable and
+lets the X post go out early. The plan puts the non-RAG capabilities first
+because they are the entry; the gate lands before any hosted call.
+
+**Consequences.** Later changes to the plan are appended to `PLAN.md` as
+dated notes and cited here as new decisions.
+
+### D9. Glimmer cannot run on this Mac; local Llama by default, Glimmer remote through the gate (2026-10-27)
+
+**Decision.** Revises the local-model half of D7. A small Meta open weight
+(a Llama model of about 3B parameters) runs locally and phrases every answer
+by default, so the default path still sends nothing out. Muse Glimmer runs
+on partner inference (Baseten or Modal hackathon credit) and is an opt-in
+through the same consent-gated, redacted egress as the hosted Meta API
+models. The hosted jobs for SAM 3.1, Voice Transcribe, Spark and Wonder are
+unchanged.
+
+**Why.** Checked on 2026-10-27 against Meta's docs and the model card:
+Muse Glimmer ships in one size, about 29.6B parameters, dense. Its smallest
+official GGUF (`Muse-Glimmer-30B-KQuant-17GB-Q4_K_M.gguf`) is 16.8 GB on
+disk and needs about 15.6 GiB of memory for the text model alone, 19.0 GiB
+with the vision projector and full context. This Mac has 16 GB of RAM
+shared with the engine, a browser and a screen recorder. Muse Spark Open
+is 816B total parameters. No smaller Meta open weight is listed.
+
+**Consequences.** The privacy promise holds unchanged. Stage 1 is met by
+Meta open weights locally plus the Meta API. Best Open-Weight stays
+reachable because Glimmer does real phrasing work on partner inference.
+Day 1 measures the local Llama, not Glimmer; Glimmer joins on day 5 with
+the gate. If a model other than Llama is chosen for the local path, that is
+a new decision.
+
 ## Open
 
 Questions to settle when they come up, each becoming a numbered decision
