@@ -1,0 +1,55 @@
+# Secrets and local configuration. Never commit the Meta API key.
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+secrets/
+.claude/settings.local.json
+
+# Recordings (screen, audio, video). Kept off the repo; too large and too private.
+recordings/
+*.mp4
+*.mov
+*.mkv
+*.webm
+*.m4v
+*.wav
+*.m4a
+*.mp3
+*.aiff
+*.flac
+
+# Model weights and local inference artifacts.
+models/
+*.gguf
+*.safetensors
+*.pt
+*.pth
+*.onnx
+*.mlmodel
+*.mlpackage
+
+# Brain data (local only; the memory lives on the owner's Mac).
+data/
+*.sqlite
+*.sqlite3
+*.db
+*.db-wal
+*.db-shm
+
+# Build output and dependencies.
+node_modules/
+dist/
+build/
+out/
+coverage/
+.venv/
+__pycache__/
+*.pyc
+
+# OS and editor noise.
+.DS_Store
+Thumbs.db
+*.swp
+*.log
