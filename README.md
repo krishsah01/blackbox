@@ -21,11 +21,13 @@ build, starting from the first commit in this repository.
 
 ## Models
 
-Hybrid, local by default. Muse Glimmer runs on the owner's Mac and phrases
-every answer; the default path sends nothing out. Hosted Meta models
-(SAM 3.1, Voice Transcribe, Muse Spark, Muse Wonder) each take one job the
-local model cannot do, and reach the API only through a consent-gated,
-redacted egress. The promise is: nothing leaves without being shown first.
+Hybrid, local by default. A small Meta open weight (Llama, about 3B) runs
+on the owner's Mac and phrases every answer; the default path sends nothing
+out. Muse Glimmer (30B, too large for this 16 GB machine) runs on partner
+inference as an opt-in phrasing model. Hosted Meta models (SAM 3.1, Voice
+Transcribe, Muse Spark, Muse Wonder) each take one job the local model
+cannot do. Every remote call, Glimmer included, goes through a
+consent-gated, redacted egress. The promise is: nothing leaves without being shown first.
 
 ## Privacy and security
 
@@ -53,3 +55,4 @@ work is copied in; only ideas carry over.
 | Date | What was built |
 | --- | --- |
 | 2026-10-27 | Repository created. README with this section, `.gitignore` for recordings, model files and secrets. |
+| 2026-10-27 | `DECISIONS.md` seeded with the day's decisions (D1 to D9). `PLAN.md`: the agreed nine-day plan. Found that Muse Glimmer (30B) cannot run on the 16 GB build machine; local phrasing moves to a small Llama, Glimmer to partner inference behind the gate (D9). |
