@@ -91,10 +91,10 @@ export interface LinkQuery {
 
 /**
  * Relations that are a current pointer: one dst per src at any moment (a
- * branch is "at" one commit). The log keeps every position; the derived
+ * branch is "at" one commit; a file has one "current" version). The log keeps every position; the derived
  * table keeps only the newest, so nothing stale is ever shown as current.
  */
-export const POINTER_RELS: readonly string[] = ["at"];
+export const POINTER_RELS: readonly string[] = ["at", "current"];
 
 const SCHEMA = `
 CREATE TABLE IF NOT EXISTS events (
