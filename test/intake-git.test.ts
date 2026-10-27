@@ -84,6 +84,17 @@ test("commits and branches become memories with recorded links", async () => {
     assert.equal(again.commits, 0);
     assert.equal(again.links, 0);
     assert.equal(again.skipped, 4);
+
+    // A commit moves main: the branch memory follows the tip and the old "at" is no longer current.
+    writeFileSync(join(repo, "x.txt"), "x\n");
+    execFileSync("git", ["-C", repo, "add", "x.txt"]);
+    execFileSync("git", ["-C", repo, "commit", "-q", "-m", "third"], { env: { ...process.env, GIT_AUTHOR_DATE: "2026-10-27T07:00:00-04:00", GIT_COMMITTER_DATE: "2026-10-27T07:00:00-04:00" } });
+    const third = (await readCommits(repo))[0]!;
+    const moved = await intakeGit(s, repo);
+    assert.equal(moved.commits, 1);
+    assert.equal(moved.branches, 1, "main is a new version");
+    assert.equal(s.memory("branch:main")?.body, `at ${third.sha.slice(0, 7)}`);
+    assert.deepEqual(s.links({ src: "branch:main", rel: "at" }).map((l) => l.dst), [`commit:${third.sha}`]);
     s.close();
   } finally {
     rmSync(repo, { recursive: true, force: true });

@@ -178,19 +178,21 @@ export async function intakeGit(store: Store, repo: string): Promise<GitIntakeRe
   for (const b of await readBranches(repo)) {
     const tip = bySha.get(b.sha);
     const ts = tip ? new Date(tip.authorDate).toISOString() : new Date().toISOString();
-    const r = store.addMemory({
-      ref: `branch:${b.name}`,
-      kind: "branch",
-      ts,
-      title: b.name,
-      body: `at ${b.sha.slice(0, 7)}`,
-      source,
-      meta: { sha: b.sha },
-    });
+    // Keyed by tip: a branch that moved is a new version of the same memory.
+    const r = store.addMemory(
+      {
+        ref: `branch:${b.name}`,
+        kind: "branch",
+        ts,
+        title: b.name,
+        body: `at ${b.sha.slice(0, 7)}`,
+        source,
+        meta: { sha: b.sha },
+      },
+      `branch:${b.name}@${b.sha}`,
+    );
     if (r.added) result.branches += 1;
     else result.skipped += 1;
-    // A branch moves; its "at" link is re-recorded per tip and the newest wins
-    // in the derived table while the log keeps every position.
     const lr = store.addLink({ src: `branch:${b.name}`, dst: `commit:${b.sha}`, rel: "at", how: "recorded", evidence: b.sha, by, ts });
     if (lr.added) result.links += 1;
   }

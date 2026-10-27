@@ -89,6 +89,13 @@ export interface LinkQuery {
   how?: LinkHow;
 }
 
+/**
+ * Relations that are a current pointer: one dst per src at any moment (a
+ * branch is "at" one commit). The log keeps every position; the derived
+ * table keeps only the newest, so nothing stale is ever shown as current.
+ */
+export const POINTER_RELS: readonly string[] = ["at"];
+
 const SCHEMA = `
 CREATE TABLE IF NOT EXISTS events (
   seq     INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -193,9 +200,15 @@ export class Store {
     return { added, id, hits };
   }
 
-  addMemory(m: Memory): AppendResult {
+  /**
+   * Add a memory. The event key defaults to the ref, so re-adding the same
+   * memory is a no-op. Pass a `key` that includes what changed (a branch tip)
+   * when the same ref legitimately gets a new version: the log keeps every
+   * version and the derived table shows the newest.
+   */
+  addMemory(m: Memory, key: string = m.ref): AppendResult {
     if (!MEMORY_KINDS.includes(m.kind)) throw new Error(`unknown memory kind: ${m.kind}`);
-    return this.append("memory.add", m.source, m.ref, m);
+    return this.append("memory.add", m.source, key, m);
   }
 
   addLink(l: Link): AppendResult {
@@ -214,6 +227,9 @@ export class Store {
         .run(m.ref, m.kind, m.ts, m.title, m.body, m.source, m.meta ? JSON.stringify(m.meta) : null, e.seq);
     } else if (e.kind === "link.add") {
       const l = e.payload as Link;
+      if (POINTER_RELS.includes(l.rel)) {
+        this.db.prepare("DELETE FROM links WHERE src = ? AND rel = ? AND how = ?").run(l.src, l.rel, l.how);
+      }
       this.db
         .prepare(
           `INSERT OR REPLACE INTO links (src, dst, rel, how, evidence, by, ts, event_seq)

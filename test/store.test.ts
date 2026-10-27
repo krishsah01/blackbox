@@ -102,3 +102,26 @@ test("unknown memory kinds are refused", () => {
   assert.throws(() => s.addMemory({ ...commit("x", "x"), kind: "wish" as never }), /unknown memory kind/);
   s.close();
 });
+
+test("a pointer link (branch at commit) keeps one current target; the log keeps every position", () => {
+  const s = new Store(":memory:", { now: tick() });
+  const at = (sha: string, ts: string) => s.addLink({ src: "branch:main", dst: `commit:${sha}`, rel: "at", how: "recorded", evidence: sha, by: "intake:git", ts });
+  at("a1", "2026-10-27T01:00:00.000Z");
+  at("a2", "2026-10-27T02:00:00.000Z");
+  assert.deepEqual(s.links({ src: "branch:main", rel: "at" }).map((l) => l.dst), ["commit:a2"]);
+  assert.equal(s.eventCount(), 2);
+  s.rebuild();
+  assert.deepEqual(s.links({ src: "branch:main", rel: "at" }).map((l) => l.dst), ["commit:a2"]);
+  s.close();
+});
+
+test("a memory re-added under a new key is a new version; the derived row is the newest", () => {
+  const s = new Store(":memory:", { now: tick() });
+  const b = (sha: string) => ({ ref: "branch:main", kind: "branch" as const, ts: "2026-10-27T01:00:00.000Z", title: "main", body: `at ${sha}`, source: "git:/repo" });
+  assert.equal(s.addMemory(b("a1"), "branch:main@a1").added, true);
+  assert.equal(s.addMemory(b("a1"), "branch:main@a1").added, false);
+  assert.equal(s.addMemory(b("a2"), "branch:main@a2").added, true);
+  assert.equal(s.memory("branch:main")?.body, "at a2");
+  assert.equal(s.eventCount(), 2);
+  s.close();
+});
