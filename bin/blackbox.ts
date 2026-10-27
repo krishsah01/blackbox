@@ -4,6 +4,8 @@
  *
  *   blackbox intake git [repo]      take a repository's history into the brain
  *   blackbox ask "<question>"       answer from memories, with citations
+ *   blackbox ask "<q>" --phrase     same, then phrased by the local model (nothing leaves)
+ *   blackbox model status           is the local model up, and which weights
  *   blackbox status                 what the brain holds
  *   blackbox rebuild                replay the event log into the derived tables
  *
@@ -15,16 +17,19 @@ import { Store } from "../src/store.ts";
 import { intakeGit } from "../src/intake/git.ts";
 import { ask, render } from "../src/ask.ts";
 import { NAME, VERSION } from "../src/version.ts";
+import { DEFAULT_LOCAL_MODEL, modelInfo, phrase } from "../src/model/local.ts";
 
 const dataDir = resolve(process.env.BLACKBOX_DATA ?? "data");
 const dbPath = resolve(dataDir, "blackbox.sqlite");
 const denylistFile = resolve(dataDir, "denylist");
+const baseUrl = process.env.BLACKBOX_MODEL_URL ?? `http://${DEFAULT_LOCAL_MODEL.host}:${DEFAULT_LOCAL_MODEL.port}`;
 
 function usage(): never {
   console.error(`${NAME} ${VERSION}
 usage:
   blackbox intake git [repo]
-  blackbox ask "<question>" [--json]
+  blackbox ask "<question>" [--json] [--phrase]
+  blackbox model status
   blackbox status
   blackbox rebuild`);
   process.exit(2);
@@ -33,7 +38,11 @@ usage:
 async function main(argv: string[]): Promise<void> {
   const { values, positionals } = parseArgs({
     args: argv,
-    options: { json: { type: "boolean", default: false }, help: { type: "boolean", short: "h", default: false } },
+    options: {
+      json: { type: "boolean", default: false },
+      phrase: { type: "boolean", default: false },
+      help: { type: "boolean", short: "h", default: false },
+    },
     allowPositionals: true,
   });
   if (values.help || positionals.length === 0) usage();
@@ -55,6 +64,11 @@ async function main(argv: string[]): Promise<void> {
         if (!question) usage();
         const a = ask(store, question);
         console.log(values.json ? JSON.stringify(a, null, 2) : render(a));
+        if (values.phrase) {
+          const info = await modelInfo(baseUrl);
+          const p = await phrase(baseUrl, a);
+          console.log(`\nPhrased by ${info.model} (local, nothing left this machine, ${p.ms} ms):\n${p.text}`);
+        }
         break;
       }
       case "status": {
@@ -67,6 +81,18 @@ async function main(argv: string[]): Promise<void> {
         console.log(`memories: ${kinds.map((k) => `${k.n} ${k.kind}`).join(", ") || "none"}`);
         console.log(`links: ${links.map((l) => `${l.n} ${l.how}`).join(", ") || "none"}`);
         console.log(`newest: ${store.newest() ?? "none"}`);
+        break;
+      }
+      case "model": {
+        if (sub !== "status") usage();
+        try {
+          const info = await modelInfo(baseUrl);
+          console.log(`local model up at ${baseUrl}: ${info.model}`);
+        } catch (e) {
+          console.log(`local model not reachable at ${baseUrl} (${(e as Error).message})`);
+          console.log(`start it with: llama-server ${DEFAULT_LOCAL_MODEL.hf ? `-hf ${DEFAULT_LOCAL_MODEL.hf}` : ""} --host ${DEFAULT_LOCAL_MODEL.host} --port ${DEFAULT_LOCAL_MODEL.port} --ctx-size ${DEFAULT_LOCAL_MODEL.ctxSize} --no-webui`);
+          process.exitCode = 1;
+        }
         break;
       }
       case "rebuild": {
