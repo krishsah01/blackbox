@@ -1,7 +1,8 @@
 # Plan: the nine days
 
 Status: **agreed by the owner on 2026-10-27** (decision D8 in
-`DECISIONS.md`). Changes are appended as dated notes at the end, never
+`DECISIONS.md`). **Read the Notes at the end: D11 changed the model
+plan and moved the gate to day 4.** Changes are appended as dated notes at the end, never
 edited in place, so the brain can answer "what was the plan on day 3".
 
 ## Budget
@@ -193,3 +194,18 @@ Asked as they come up, not all at once. See the "Open" section of
   strikes any sentence without a cited memory is needed, not optional.
   Screen recording has not started yet; that is the owner's step and is
   the first thing on day 2.
+- **2026-10-27, D11: the LLM work moves to the hosted Meta API.** The
+  owner's words: "lets just use meta api 150 credit that I got from the
+  event to use their llm". Muse Spark 1.3 phrases every answer; Wonder is
+  the agent; the local Llama leaves the default path; Glimmer stays only as
+  the opt-in phrasing model on partner credit (Best Open-Weight). Changes
+  to the days as written: the **egress gate moves to day 4** (one-time
+  consent for text, per-call for audio and video; every call redacted,
+  denylist-checked and logged with token counts) and **Spark phrasing with
+  the verify step lands with it**; day 4's timeline UI starts the same day
+  and finishes on day 5; day 5 keeps Voice Transcribe and Spark link
+  proposals and adds Glimmer on partner credit. Rule 5 now reads: no
+  hosted call before the gate exists, and nothing from an agent session
+  ever leaves, only the engine's bounded answer surface. "Never cut" now
+  reads: why-chain, as-of, citations, computed confidence, redaction on
+  intake, the egress gate with its ledger.

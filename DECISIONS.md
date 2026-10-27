@@ -180,6 +180,50 @@ marks memory text as data, not instructions. The engine's answer stays the
 evidence; the phrasing is labeled as phrased locally with the model name.
 Swapping to another local model is a new decision.
 
+### D11. All LLM work on the hosted Meta API, paid by the event credit (2026-10-27)
+
+**Decision.** Revises the model half of D7, D9 and D10 and narrows D4. The
+owner's words, relayed from the research session on 2026-10-27: "lets just
+use meta api 150 credit that I got from the event to use their llm".
+Confirmed by the owner in this session with these consequences:
+
+1. Every LLM job runs on the hosted Meta Model API: Muse Spark 1.3 phrases
+   every answer and does the high-volume jobs (link proposals); Muse Wonder
+   is the investigator agent only. SAM 3.1 and Voice Transcribe were already
+   hosted and are unchanged. The local Llama (D10) leaves the default path
+   and is not kept as a fallback.
+2. Text egress is consented once, at setup, and every outbound call is
+   still redacted, checked against the erased-values denylist, and
+   recorded as an event with its token counts, so the brain can answer
+   "what did we ever send out". The per-call gate stays for audio (Voice
+   Transcribe) and video (SAM) payloads.
+3. D4 is narrowed: when an answer rests on agent-session memories, only the
+   bounded, redacted answer surface (lead, steps, citations as the engine
+   built them) may be sent for phrasing. Never a transcript, never a raw
+   session message.
+4. Muse Glimmer stays in the build for one visible job, the opt-in
+   phrasing model on partner inference credit (Baseten or Modal), so the
+   entry remains eligible for Best Open-Weight.
+5. `muse-spark-1.3-contributor` is never used for private material; Meta
+   may train on it. Development on synthetic test data only.
+6. A spend limit is set on the Meta Billing page before the first call
+   (the owner's step). Budget re-check: a phrased answer is about 1.5k
+   tokens in and 300 out, about -e.003 at Spark prices; two thousand
+   answers over the week is about  on top of the plan doc's 
+   estimate, leaving about  of the  credit.
+
+**Why.** The owner has the credit and wants the entry built on Meta's
+hosted models; one hosted path is simpler than a local model plus a remote
+one, and "Use of Meta AI tooling" is 25% of the score.
+
+**Consequences.** The promise changes from "the default path sends nothing
+out" to "nothing leaves unredacted, unlogged, or unconsented; nothing from a
+session leaves at all". The egress gate must exist before phrasing does, so
+it moves from day 5 to day 4 (see PLAN.md notes). `ask --phrase` against a
+local server is a development stand-in only until day 4, then removed.
+MODELS.md is updated. The 2 GB Llama download in the Hugging Face cache is
+no longer needed.
+
 ## Open
 
 Questions to settle when they come up, each becoming a numbered decision

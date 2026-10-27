@@ -44,21 +44,28 @@ node bin/blackbox.ts ask "what happened today" --phrase
 
 ## Models
 
-Hybrid, local by default. A small Meta open weight (Llama, about 3B) runs
-on the owner's Mac and phrases every answer; the default path sends nothing
-out. Muse Glimmer (30B, too large for this 16 GB machine) runs on partner
-inference as an opt-in phrasing model. Hosted Meta models (SAM 3.1, Voice
-Transcribe, Muse Spark, Muse Wonder) each take one job the local model
-cannot do. Every remote call, Glimmer included, goes through a
-consent-gated, redacted egress. The promise is: nothing leaves without being shown first.
+The engine is deterministic and local: why-chains, as-of, versions and
+labels are computed here, with no model in the loop. The models each have
+one job, all on Meta's hosted API paid by the event credit (D11): Muse
+Spark 1.3 phrases every answer and proposes links with quoted evidence;
+Muse Wonder is the investigator agent; Voice Transcribe turns spoken
+decisions into memories; SAM 3.1 tracks a UI element across screen
+recordings. Muse Glimmer (open weight) is the opt-in phrasing model on
+partner inference. Every call leaves through one egress: redacted, checked
+against the erased-values denylist, consented (once for text, per call for
+audio and video), and recorded with its token counts. The promise is: nothing leaves without being shown first.
 
 ## Privacy and security
 
 - Sources are redacted before storage. Secrets never enter the memory.
 - Agent session transcripts are the most private source. They are redacted
-  on intake, readable only by the owner, and never sent to a hosted model.
-- Anything sent to a hosted model is shown to the owner first and recorded
-  as an event, so the brain can later answer "what did we ever send out".
+  on intake and readable only by the owner. Nothing from a session is ever
+  sent to a model; when an answer rests on session memories, only the
+  engine's bounded, redacted answer surface (lead, steps, citations) is.
+- Every outbound call is redacted, denylist-checked and recorded as an
+  event with its token counts, so the brain can answer "what did we ever
+  send out". Text egress is consented once at setup; audio and video are
+  shown and consented per call.
 - Forgetting is owner-only and leaves a tombstone.
 - No live team feed of any kind. Durable forge records (an issue, a PR,
   its commits) are fine as context.
@@ -80,3 +87,4 @@ work is copied in; only ideas carry over.
 | 2026-10-27 | Repository created. README with this section, `.gitignore` for recordings, model files and secrets. |
 | 2026-10-27 | `DECISIONS.md` seeded with the day's decisions (D1 to D9). `PLAN.md`: the agreed nine-day plan. Found that Muse Glimmer (30B) cannot run on the 16 GB build machine; local phrasing moves to a small Llama, Glimmer to partner inference behind the gate (D9). |
 | 2026-10-27 | Day 1 engine: TypeScript skeleton with tests, redaction (key shapes, assignments, emails, tokens, erased-values denylist), append-only SQLite event log with rebuildable memories and links, git intake (commits, branches, recorded links: touches, parent, cites D<n>, at), `ask "what happened today"` with citations and a computed label, CLI. Local model client with drained pipes; Llama 3.2 3B Instruct pinned as the local phrasing model (D10). The brain answered its first question about its own day from its own commits. |
+| 2026-10-27 | D11: all LLM work moves to the hosted Meta API on the event credit; the local Llama leaves the default path; the egress gate moves to day 4; D4 narrowed to "only the engine's answer surface ever leaves". |
