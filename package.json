@@ -1,0 +1,23 @@
+{
+  "name": "blackbox",
+  "version": "0.0.1",
+  "description": "A project brain that remembers its own build: why-chains, as-of answers, every version, every answer cited.",
+  "private": true,
+  "type": "module",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=26"
+  },
+  "bin": {
+    "blackbox": "./bin/blackbox.ts"
+  },
+  "scripts": {
+    "test": "node --test --test-reporter=spec 'test/**/*.test.ts'",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run typecheck && npm test"
+  },
+  "devDependencies": {
+    "@types/node": "^26.0.0",
+    "typescript": "^5.9.0"
+  }
+}
