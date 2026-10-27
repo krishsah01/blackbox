@@ -2,7 +2,8 @@
 /**
  * blackbox: the CLI.
  *
- *   blackbox intake git [repo]      take a repository's history into the brain
+ *   blackbox intake all [repo]      git history, doc versions and decisions into the brain
+ *   blackbox intake git [repo]      git history only
  *   blackbox ask "<question>"       answer from memories, with citations
  *   blackbox ask "<q>" --phrase     same, then phrased by the local model (nothing leaves)
  *   blackbox model status           is the local model up, and which weights
@@ -14,7 +15,9 @@
 import { resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { Store } from "../src/store.ts";
-import { intakeGit } from "../src/intake/git.ts";
+import { intakeGit, readCommits } from "../src/intake/git.ts";
+import { intakeDocs, readDocVersions } from "../src/intake/docs.ts";
+import { intakeDecisionsFromVersions } from "../src/intake/decisions.ts";
 import { ask, render } from "../src/ask.ts";
 import { NAME, VERSION } from "../src/version.ts";
 import { DEFAULT_LOCAL_MODEL, modelInfo, phrase } from "../src/model/local.ts";
@@ -27,7 +30,7 @@ const baseUrl = process.env.BLACKBOX_MODEL_URL ?? `http://${DEFAULT_LOCAL_MODEL.
 function usage(): never {
   console.error(`${NAME} ${VERSION}
 usage:
-  blackbox intake git [repo]
+  blackbox intake all|git [repo]
   blackbox ask "<question>" [--json] [--phrase]
   blackbox model status
   blackbox status
@@ -51,12 +54,20 @@ async function main(argv: string[]): Promise<void> {
   try {
     switch (cmd) {
       case "intake": {
-        if (sub !== "git") usage();
+        if (sub !== "git" && sub !== "all") usage();
         const repo = resolve(rest[0] ?? ".");
         const r = await intakeGit(store, repo);
         console.log(
           `${repo}: +${r.commits} commits, +${r.branches} branches, +${r.links} links; ${r.skipped} already known; ${r.redactions} redactions`,
         );
+        if (sub === "all") {
+          const commits = await readCommits(repo);
+          const d = await intakeDocs(store, repo, commits);
+          console.log(`docs: +${d.versions} versions, +${d.links} links; ${d.skipped} already known`);
+          const versions = (await readDocVersions(repo, commits)).filter((v) => /(^|\/)DECISIONS\.md$/.test(v.path));
+          const dec = intakeDecisionsFromVersions(store, versions, `git:${repo}`);
+          console.log(`decisions: ${dec.decisions} ids, +${dec.versions} versions, +${dec.links} links; ${dec.skipped} already known`);
+        }
         break;
       }
       case "ask": {

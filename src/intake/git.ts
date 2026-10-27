@@ -113,9 +113,15 @@ export function citedDecisions(text: string): Array<{ id: string; span: string }
     const id = `D${m[1]}`;
     if (seen.has(id)) continue;
     seen.add(id);
-    const start = Math.max(0, m.index - 20);
-    const end = Math.min(text.length, m.index + m[0].length + 20);
-    out.push({ id, span: text.slice(start, end).replace(/\s+/g, " ").trim() });
+    // The sentence around the mention, bounded, with whitespace collapsed.
+    const before = text.slice(0, m.index);
+    const after = text.slice(m.index + m[0].length);
+    const start = Math.max(before.lastIndexOf(". ") + 1, before.lastIndexOf("\n") + 1, before.length - 60, 0);
+    const endRel = (() => {
+      const e = after.search(/[.!?](\s|$)|\n/);
+      return Math.min(e === -1 ? after.length : e + 1, 60);
+    })();
+    out.push({ id, span: (before.slice(start) + m[0] + after.slice(0, endRel)).replace(/\s+/g, " ").trim() });
   }
   return out;
 }

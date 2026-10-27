@@ -41,8 +41,8 @@ test("an empty window is labeled insufficient evidence, not invented", () => {
 
 test("questions the engine cannot answer yet are refused honestly", () => {
   const s = new Store(":memory:");
-  const a = ask(s, "why is the repo separate from One Connect?", NOW);
+  const a = ask(s, "how many files are there", NOW);
   assert.equal(a.label, "insufficient evidence");
-  assert.match(a.refusal ?? "", /Day 1 answers/);
+  assert.match(a.refusal ?? "", /Answerable today/);
   s.close();
 });

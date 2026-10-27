@@ -7,6 +7,7 @@
  * the engine's steps and citations are what the UI shows as evidence.
  */
 import type { Memory, Store } from "./store.ts";
+import { why } from "./why.ts";
 
 export type Label = "supported" | "insufficient evidence";
 
@@ -119,6 +120,7 @@ export function whatHappened(store: Store, question: string, window: Window): An
 /** Route a question. Day 1 knows one shape; everything else is refused honestly. */
 export function ask(store: Store, question: string, now: Date = new Date()): Answer {
   const q = question.trim();
+  if (/^\s*why\b/i.test(q) || /\bwhy\b.*\?\s*$/i.test(q)) return why(store, q);
   const window = parseWindow(q, now);
   if (/\bwhat happened\b/i.test(q) && window) return whatHappened(store, q, window);
   if (window) return whatHappened(store, q, window);
@@ -128,7 +130,7 @@ export function ask(store: Store, question: string, now: Date = new Date()): Ans
     steps: [],
     label: "insufficient evidence",
     inputs: { memories_total: store.memories().length },
-    refusal: 'Day 1 answers "what happened today | yesterday | YYYY-MM-DD". Why-chains arrive on day 2, as-of on day 3.',
+    refusal: 'Answerable today: "what happened today | yesterday | YYYY-MM-DD" and "why ...". As-of arrives on day 3.',
   };
 }
 
