@@ -209,3 +209,12 @@ Asked as they come up, not all at once. See the "Open" section of
   ever leaves, only the engine's bounded answer surface. "Never cut" now
   reads: why-chain, as-of, citations, computed confidence, redaction on
   intake, the egress gate with its ledger.
+- **2026-10-27, day 2 engine done early.** Decision intake, doc versions
+  and why-chains landed the same day as day 1, so day 2 (Oct 28) starts
+  with screen recording (the owner's step), then as-of and computed
+  confidence from the day-3 list. The evening question "Why is the repo
+  separate from One Connect?" is answered: D1, recorded in DECISIONS.md
+  @ 8c15b38, written by that commit. The question reached D1 by keyword
+  match, an inferred hop, so the label is "insufficient evidence" even
+  though every link after it is recorded. Day 3's computed confidence
+  should make that a number instead of a cliff.
